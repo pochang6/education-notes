@@ -1,75 +1,62 @@
-# F5-TTS AWS Deployment (CDK)
+# F5-TTS AWS デプロイ（CDK 版）
 
-This CDK project provisions an EC2 instance pre-configured for the F5‑TTS voice synthesis toolkit as described in `F5-TTS完全実践ガイド(AWS_EC2).md`.
+この CDK プロジェクトは、`F5-TTS完全実践ガイド(AWS_EC2).md` に記載されたとおり、F5‑TTS 音声合成ツールキット用に事前構成された EC2 インスタンスを構築します。
 
-## Requirements
+## 前提条件
 
-- Python 3.8+
-- AWS credentials configured for CDK
-- [AWS CDK Toolkit](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (`npm install -g aws-cdk`)
-
-## Setup
-
-1. Create and activate a Python virtual environment:
+* Python 3.8 以上
+* CDK 用に設定された AWS 認証情報
+* [AWS CDK ツールキット](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html)（以下でインストール）
 
 ```bash
+npm install -g aws-cdk
+```
+
+## セットアップ手順
+
+```bash
+# ① 仮想環境の作成と有効化
 python3 -m venv .venv
 source .venv/bin/activate
-```
 
-2. Install dependencies:
-
-```bash
+# ② 依存パッケージのインストール
 pip install -r requirements.txt
-```
 
-3. Bootstrap the CDK (first time in an AWS account/region):
-
-```bash
+# ③ CDK 初期化（初回のみ）
 cdk bootstrap
-```
 
-4. Deploy the stack. Specify an existing EC2 key pair name via context or edit `app.py`:
-
-```bash
+# ④ スタックのデプロイ（キーペア名を指定）
 cdk deploy -c key_name=<your-keypair-name>
 ```
 
-The stack creates:
+## スタック作成内容
 
-- Security group allowing SSH (22) and Gradio UI (7860)
-- g4dn.xlarge EC2 instance with Deep Learning AMI
-- 60 GB gp3 root volume
-- Elastic IP attached to the instance
-- User data that installs Git, FFmpeg and clones F5‑TTS
+* SSH (22番) と Gradio UI (7860番) を許可するセキュリティグループ
+* Deep Learning AMI を使った g4dn.xlarge EC2 インスタンス
+* 60GB gp3 EBS（ルート）
+* Elastic IP
+* Git、FFmpeg のインストールおよび F5‑TTS のクローンを含むユーザーデータ
 
-After deployment, note the Elastic IP from the outputs or the EC2 console.
-
-## Manual Steps
-
-1. Upload your prepared `wavs` directory and `metadata.csv` to the instance:
+## 手動作業
 
 ```bash
+# ① 音声ファイルとメタデータのアップロード
 scp -i <keypair.pem> -r ./wavs ubuntu@<ElasticIP>:/home/ubuntu/F5-TTS/data/pocho/
 scp -i <keypair.pem> metadata.csv ubuntu@<ElasticIP>:/home/ubuntu/F5-TTS/data/pocho/
-```
 
-2. SSH into the instance and start the Gradio UI for a quick test:
-
-```bash
+# ② インスタンスへ SSH 接続し Gradio UI を起動
 ssh -i <keypair.pem> ubuntu@<ElasticIP>
 F5-tts_infer-gradio
-```
 
-3. To train your model, prepare a config and run:
-
-```bash
+# ③ モデル学習の実行（設定ファイルを準備して起動）
 cd F5-TTS
 cp configs/base_config.json configs/pocho_config.json
-# edit the config as needed
+# ※ テキストエディタで pocho_config.json を編集
 python train.py --config configs/pocho_config.json
 ```
 
-### Cleaning Up
+## 後始末（リソース削除）
 
-Run `cdk destroy` to remove the deployed resources when finished.
+```bash
+cdk destroy
+```
