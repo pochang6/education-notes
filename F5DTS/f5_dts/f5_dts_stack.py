@@ -22,7 +22,14 @@ class F5DtsStack(Stack):
         sg.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(22), "SSH")
         sg.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(7860), "Gradio UI")
 
-        ami_id = "ami-0f36dc4944df7a3d6"  # Deep Learning AMI GPU PyTorch 1.13.1 (Ubuntu 20.04) Tokyo
+        # Look up the latest Deep Learning AMI for PyTorch on Ubuntu 20.04.
+        # Using a lookup ensures we always fetch a valid AMI ID for the
+        # selected region instead of relying on a hard-coded value which may
+        # become outdated.
+        ami = ec2.MachineImage.lookup(
+            name="Deep Learning AMI GPU PyTorch 1.13.1 (Ubuntu 20.04)*",
+            owners=["amazon"],
+        )
 
         user_data = ec2.UserData.for_linux()
         user_data.add_commands(
@@ -37,7 +44,7 @@ class F5DtsStack(Stack):
             self,
             "F5TtsInstance",
             instance_type=ec2.InstanceType("g4dn.xlarge"),
-            machine_image=ec2.MachineImage.generic_linux({self.region: ami_id}),
+            machine_image=ami,
             security_group=sg,
             vpc=vpc,
             key_name=key_name,

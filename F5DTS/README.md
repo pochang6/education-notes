@@ -18,10 +18,17 @@ macOS (for example on a MacBook Air) and start from a blank environment.
    # enter the Access Key, Secret Key, default region (e.g. ap-northeast-1) and
    # output format (e.g. json)
    ```
-3. **Node.js** and the AWS CDK Toolkit:
+   
+3. **Node.js** (version 20 or 22) and the AWS CDK Toolkit:
+
+   CDK 2.x is tested with Node 20 and Node 22.  Using a newer release such as
+   Node 24 will print a warning.  On macOS you can install the LTS version and
+   the CDK CLI as follows:
 
    ```bash
-   brew install node
+   brew install node@20
+   echo 'export PATH="$(brew --prefix node@20)/bin:$PATH"' >> ~/.zprofile
+   source ~/.zprofile
    npm install -g aws-cdk
    ```
 4. **Python 3.8+** – available on recent macOS versions.  Verify with
@@ -70,6 +77,7 @@ console.  The stack creates:
 
 - Security group allowing SSH (22) and Gradio UI (7860)
 - g4dn.xlarge EC2 instance with Deep Learning AMI
+- the latest AMI ID is looked up automatically at deploy time
 - 60 GB gp3 root volume
 - Elastic IP attached to the instance
 - User data that installs Git, FFmpeg and clones F5‑TTS
