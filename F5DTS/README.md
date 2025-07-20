@@ -18,6 +18,7 @@ macOS (for example on a MacBook Air) and start from a blank environment.
    # enter the Access Key, Secret Key, default region (e.g. ap-northeast-1) and
    # output format (e.g. json)
    ```
+   
 3. **Node.js** (version 20 or 22) and the AWS CDK Toolkit:
 
    CDK 2.x is tested with Node 20 and Node 22.  Using a newer release such as
