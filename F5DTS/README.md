@@ -1,62 +1,112 @@
-# F5-TTS AWS デプロイ（CDK 版）
+# F5-TTS AWS Deployment (CDK)
 
-この CDK プロジェクトは、`F5-TTS完全実践ガイド(AWS_EC2).md` に記載されたとおり、F5‑TTS 音声合成ツールキット用に事前構成された EC2 インスタンスを構築します。
+This directory contains an AWS CDK stack that automatically builds an EC2
+environment ready for the F5‑TTS voice synthesis toolkit as described in
+`F5-TTS完全実践ガイド(AWS_EC2).md`.  The instructions below assume you are using
+macOS (for example on a MacBook Air) and start from a blank environment.
 
-## 前提条件
+## Prerequisites
 
-* Python 3.8 以上
-* CDK 用に設定された AWS 認証情報
-* [AWS CDK ツールキット](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html)（以下でインストール）
+1. **AWS account** – sign up at <https://aws.amazon.com/> and create an IAM user
+   with administrative privileges.  Generate an **Access Key ID** and **Secret
+   Access Key** for this user.
+2. **AWS CLI** – install via Homebrew and configure your credentials:
+
+   ```bash
+   brew install awscli
+   aws configure
+   # enter the Access Key, Secret Key, default region (e.g. ap-northeast-1) and
+   # output format (e.g. json)
+   ```
+3. **Node.js** and the AWS CDK Toolkit:
+
+   ```bash
+   brew install node
+   npm install -g aws-cdk
+   ```
+4. **Python 3.8+** – available on recent macOS versions.  Verify with
+
+   ```bash
+   python3 --version
+   ```
+
+## Setup
+
+1. Clone this repository and change into the `F5DTS` directory:
+
+   ```bash
+   git clone https://github.com/pochang6/education-notes.git
+   cd education-notes/F5DTS
+   ```
+
+2. Create and activate a Python virtual environment:
 
 ```bash
-npm install -g aws-cdk
-```
-
-## セットアップ手順
-
-```bash
-# ① 仮想環境の作成と有効化
 python3 -m venv .venv
 source .venv/bin/activate
+```
 
-# ② 依存パッケージのインストール
+3. Install dependencies:
+
+```bash
 pip install -r requirements.txt
+```
 
-# ③ CDK 初期化（初回のみ）
+4. Bootstrap the CDK (first time you use CDK in this AWS account and region):
+
+```bash
 cdk bootstrap
+```
 
-# ④ スタックのデプロイ（キーペア名を指定）
+5. Deploy the stack.  Pass the name of an existing EC2 key pair via context (create one in the EC2 console if you do not have it):
+
+```bash
 cdk deploy -c key_name=<your-keypair-name>
 ```
 
-## スタック作成内容
+The deployment takes several minutes.  When it finishes the command output will
+print the allocated **Elastic IP**.  You can also find this address in the EC2
+console.  The stack creates:
 
-* SSH (22番) と Gradio UI (7860番) を許可するセキュリティグループ
-* Deep Learning AMI を使った g4dn.xlarge EC2 インスタンス
-* 60GB gp3 EBS（ルート）
-* Elastic IP
-* Git、FFmpeg のインストールおよび F5‑TTS のクローンを含むユーザーデータ
+- Security group allowing SSH (22) and Gradio UI (7860)
+- g4dn.xlarge EC2 instance with Deep Learning AMI
+- 60 GB gp3 root volume
+- Elastic IP attached to the instance
+- User data that installs Git, FFmpeg and clones F5‑TTS
 
-## 手動作業
+After deployment, note the Elastic IP from the outputs or the EC2 console.
+
+## Manual Steps
+
+1. In a new terminal window upload your prepared `wavs` directory and
+   `metadata.csv` to the instance.  Replace `<ElasticIP>` with the address output
+   from the deploy step and `<keypair.pem>` with the path to your private key:
 
 ```bash
-# ① 音声ファイルとメタデータのアップロード
 scp -i <keypair.pem> -r ./wavs ubuntu@<ElasticIP>:/home/ubuntu/F5-TTS/data/pocho/
 scp -i <keypair.pem> metadata.csv ubuntu@<ElasticIP>:/home/ubuntu/F5-TTS/data/pocho/
+```
 
-# ② インスタンスへ SSH 接続し Gradio UI を起動
+2. SSH into the instance and start the Gradio UI for a quick test:
+
+```bash
 ssh -i <keypair.pem> ubuntu@<ElasticIP>
 F5-tts_infer-gradio
+```
+   Then open `http://<ElasticIP>:7860` in your browser and type some text to hear
+   the synthesized voice.
 
-# ③ モデル学習の実行（設定ファイルを準備して起動）
+3. To train your model, prepare a config and run:
+
+```bash
 cd F5-TTS
 cp configs/base_config.json configs/pocho_config.json
-# ※ テキストエディタで pocho_config.json を編集
+# edit the config as needed
 python train.py --config configs/pocho_config.json
 ```
 
-## 後始末（リソース削除）
+### Cleaning Up
 
-```bash
-cdk destroy
-```
+Run `cdk destroy` to remove all resources when you are done.  Alternatively you
+can stop the EC2 instance from the AWS console while keeping the environment for
+later use.
