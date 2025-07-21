@@ -99,8 +99,10 @@ scp -i <keypair.pem> metadata.csv ubuntu@<ElasticIP>:/home/ubuntu/F5-TTS/data/po
 
 ```bash
 ssh -i <keypair.pem> ubuntu@<ElasticIP>
-F5-tts_infer-gradio
+f5-tts_infer-gradio
 ```
+If the command is not found, ensure `$HOME/.local/bin` is in your `PATH` or
+re-login to refresh the environment.
    Then open `http://<ElasticIP>:7860` in your browser and type some text to hear
    the synthesized voice.
 
