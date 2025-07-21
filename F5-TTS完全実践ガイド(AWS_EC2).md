@@ -18,7 +18,7 @@
 
 ## 🧱 ステップ0：音声データの前処理（参考：今回はスキップ）
 
-※ここは準備済みであれば読み飛ばしてOK。今後他人に伝えるために記載。
+※ここは準備済みであれば読み飛ばしてOK。
 
 ### ◯ 0-1. 音源のWAV化
 
@@ -179,6 +179,4 @@ python train.py --config configs/pocho_config.json
 - Gradio: [https://www.gradio.app/](https://www.gradio.app/)
 
 ---
-
-この手順をベースに、ひろさんが公開できる形式（GitHub Projects/Wiki/README）などへ自由に変換してご活用ください。
 
