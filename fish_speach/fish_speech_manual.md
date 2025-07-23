@@ -48,7 +48,7 @@ source .venv/bin/activate  # Windows WSL2 も Mac も同様
 ```bash
 git clone https://github.com/fishaudio/fish-speech.git
 cd fish-speech
-pip install -r requirements.txt
+pip install -e .
 ```
 
 ### 3. その他依存ツールのインストール
