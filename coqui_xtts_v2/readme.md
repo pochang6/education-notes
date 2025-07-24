@@ -1,6 +1,6 @@
 # 日本語音声クローン生成ガイド（XTTS v2 + Coqui TTS）
 
-この手順は、**macOS または Windows 環境で、10秒以内の日本語音声をもとに高精度な音声合成を行う**ためのセットアップ手順です。  
+この手順は、**macOS または WSL2（Windows Subsystem for Linux）環境で、10秒以内の日本語音声をもとに高精度な音声合成を行う**ためのセットアップ手順です。  
 
 ---
 
@@ -13,11 +13,11 @@ mkdir -p ~/develop/xtts_v2_jp
 cd ~/develop/xtts_v2_jp
 ```
 
-### ✅ Windows の場合（PowerShell）
+### ✅ WSL2（Ubuntu）の場合
 
-```powershell
-mkdir $HOME\develop\xtts_v2_jp
-cd $HOME\develop\xtts_v2_jp
+```bash
+mkdir -p ~/develop/xtts_v2_jp
+cd ~/develop/xtts_v2_jp
 ```
 
 ---
@@ -31,11 +31,11 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### ✅ Windows
+### ✅ WSL2（Ubuntu）
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\activate
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
 ---
@@ -55,7 +55,7 @@ pip install TTS torch
 
 ```bash
 mkdir wavs
-# Finderやエクスプローラーで input.wav を wavs/ に入れる
+# Finderやファイルマネージャで input.wav を wavs/ に入れる
 ```
 
 ---
@@ -97,10 +97,11 @@ python generate.py
 afplay output.wav
 ```
 
-### ✅ Windows
+### ✅ WSL2（Ubuntu）
 
-```powershell
-start output.wav
+```bash
+sudo apt install -y ffmpeg
+ffplay output.wav
 ```
 
 ---
@@ -126,4 +127,4 @@ develop/xtts_v2_jp/
 
 ---
 
-この手順に従えば、**MacでもWindowsでもXTTS v2を使った日本語音声クローンがローカルで実現**できます。
+この手順に従えば、**macOSでもWSL2でもXTTS v2を使った日本語音声クローンがローカルで実現**できます。
